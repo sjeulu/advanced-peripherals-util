@@ -60,8 +60,7 @@ parseCmd f = command "generate-textures" $ info
       <> short 'o'
       <> value ("src" </> "generated" </> "block-textures")
       <> help (Text.unpack [text|
-        Where to the directory where the output "assets" directory resides e.g.
-        `src/generated/resources`.
+        Where to output the generated textures
       |])
       )
     <*> option (Just <$> str)
