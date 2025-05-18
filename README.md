@@ -6,9 +6,11 @@ A maintenance script for the [AdvancedPeripherals](https://github.com/Intelligen
 
 ### Generating the procedural textures
 
-Run the following command in the root directory of the main repository:
+[Install Nix](https://nixos.org/download/) and run the following command in the root directory of the main repository:
 ```
-nix run github:sjeulu/advanced-peripherals-util -- generate-textures
+nix --extra-experimental-features "nix-command flake" run github:sjeulu/advanced-peripherals-util -- generate-textures
 ```
+
+`--extra-experimental-features` is not needed if you have them enabled already.
 
 See `... generate-textures --help` for more.
