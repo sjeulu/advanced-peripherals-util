@@ -40,9 +40,10 @@ buildBlock faces = pure $ \seed -> MkBlockTexture ?blockName (faces seed)
 
 run
   :: FilePath
+  -> Noise.Seed
   -> Builder
   -> ExceptT Error IO (BlockTexture Image.VS Image.RGBA Double)
-run assetsDir builder = do
+run assetsDir seed builder = do
   f <- flip resolve builder \textureName -> do
     let
       texturePath = assetsDir </> textureName <> ".png"
@@ -57,4 +58,4 @@ run assetsDir builder = do
       else throwError $ Text.unpack [text|
         could not find texture $texturePath'
       |]
-  lift Random.randomIO <&> f
+  pure (f seed)

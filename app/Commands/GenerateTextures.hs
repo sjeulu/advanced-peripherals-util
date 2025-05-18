@@ -24,17 +24,20 @@ import Options.Applicative
   ( Mod, CommandFields
   , info, progDesc
   , option, str
-  , command, long, short, value, help, switch
+  , command, long, short, value, help, switch, auto
   )
 import System.FilePath ((</>))
 import System.Process (callProcess)
 import Data.Maybe (fromMaybe)
 import System.Directory (setCurrentDirectory)
+import qualified Numeric.Noise as Noise
+import qualified System.Random as Random
 
 
 data CmdOpts = MkCmdOpts
   { assetsPath :: FilePath
   , outputPath :: FilePath
+  , seed :: Maybe Noise.Seed
   , inject :: Maybe FilePath
   , gifOnly :: Bool
   , upscale :: Bool
@@ -61,6 +64,15 @@ parseCmd f = command "generate-textures" $ info
       <> value ("src" </> "generated" </> "block-textures")
       <> help (Text.unpack [text|
         Where to output the generated textures
+      |])
+      )
+    <*> option (Just <$> auto)
+      ( long "seed"
+      <> short 's'
+      <> value Nothing
+      <> help (Text.unpack [text|
+        The seed to use for the procedural textures. Defaults to a random one
+        every time the script is run.
       |])
       )
     <*> option (Just <$> str)
@@ -100,9 +112,11 @@ run opts = do
   putStrLn $ "Using " ++ assetsPath' ++ " as the assets directory"
   putStrLn $ "Using " ++ outputPath' ++ " as the output path"
 
+  seed' <- liftA2 fromMaybe Random.randomIO (pure $ seed opts)
+
   forM_ AdvancedPeripheralBuilders.allBuilders
     \(Text.pack -> name, builder) -> do
-      runExceptT (Builder.run assetsPath' builder) >>= \case
+      runExceptT (Builder.run assetsPath' seed' builder) >>= \case
         Right blockTexture -> do
           let
             blockTexture' = applyWhen (upscale opts)
