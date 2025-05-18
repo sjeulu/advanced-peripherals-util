@@ -23,7 +23,7 @@
           haskellProjects.default = with pkgs; {
             basePackages = haskell.packages.ghc96;
             projectRoot = ./.;
-            autoWire = [ "packages" "apps" ];
+            autoWire = [ "packages" "apps" "devShells" ];
             settings.extraBuildDepends = [ zlib zip ];
             devShell.tools = hp: {
               ghc = haskell.compiler.ghc96;
@@ -32,9 +32,6 @@
                 supportedGhcVersions = [ "96" ];
               };
             };
-          };
-          devShells.util = pkgs.mkShell {
-            inputsFrom = [ config.haskellProjects.util.outputs.devShell ];
           };
         };
     };
